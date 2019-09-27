@@ -1,0 +1,126 @@
+---
+title: "Assignment 6"
+author: "Yelie Yuan"
+date: "9/27/2019"
+output:
+  html_document: default
+  pdf_document:
+    latex_engine: xelatex
+---
+
+#### 1. Follow the lecture notes to verify the validity of the provided E- and M-steps. That is, derive the updating rules in the given algorithm based on the construction of an EM algorithm.
+
+
+Density of $y_i$ is
+
+$$
+f(y_i\mid \mathbf{x}_i,\boldsymbol{\Psi})= \sum_{j=1}^{m} \pi_{j}\phi(y_i;\mathbf{x}_i^{\top}\boldsymbol{\beta}_{j}, \sigma^2),\qquad i=1,\ldots,n,
+$$
+
+So density of $y_i - \mathbf{x}_i^{\top}\boldsymbol{\beta}_{j}$ is 
+$$
+f(y_i - \mathbf{x}_i^{\top}\boldsymbol{\beta}_{j}\mid \boldsymbol{\Psi})= \sum_{j=1}^{m} \pi_{j}\phi(y_i - \mathbf{x}_i^{\top}\boldsymbol{\beta}_{j};0, \sigma^2),\qquad i=1,\ldots,n,
+$$
+
+From the nots, we have
+$$
+\begin{aligned}
+Q(\theta | \theta_t) &= \sum_z p(\boldsymbol{z|x, \theta_t}) \ln p(\boldsymbol{x, z | \theta}) \\
+& = \sum_{i = 1}^n \sum_{k = 1}^K p(z_i = k| \boldsymbol{x_i, \theta_t}) \ln p(z_i = k, \boldsymbol{x_i | \theta})
+\end{aligned}
+$$
+In this exercise,
+
+$$
+Q(\boldsymbol{\Psi} | \boldsymbol{\Psi}^{(k)}) = \sum_{i = 1}^n \sum_{j = 1}^m p(z_{ij} | y_i, \boldsymbol{\mathbf{x}_i, {\Psi}^{(k)}}) \log p(z_{ij}, y_i,  \boldsymbol{\mathbf{x}_i | \Psi})
+$$
+
+By Bayes rule,
+
+
+$$
+\begin{aligned}
+p(z_{ij} | y_i, \boldsymbol{\mathbf{x}_i, {\Psi}^{(k)}}) 
+& = {p(z_{ij} , y_i, \boldsymbol{\mathbf{x}_i, |{\Psi}^{(k)}}) \over p(y_i, \boldsymbol{\mathbf{x}_i, |{\Psi}^{(k)}})} \\
+& = {p(z_{ij} , y_i, \boldsymbol{\mathbf{x}_i, |{\Psi}^{(k)}}) \over \sum_{j = 1}^mp(z_{ij}, y_i, \boldsymbol{\mathbf{x}_i, |{\Psi}^{(k)}})} \\
+& = {{\pi_{j}^{(k)}\phi(y_{i}-\boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}^{(k)}};0,\sigma^{2^{(k)}})} \over {\sum_{j=1}^{m}\pi_{j}^{(k)}\phi(y_{i}-\boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}^{(k)}};0,\sigma^{2^{(k)}})}} \\
+& = p_{ij}^{(k + 1)} \\
+p(z_{ij}, y_i, \boldsymbol{\mathbf{x}_i | \Psi}) & = {\pi_{j}\phi(y_{i}-\boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}};0,\sigma^2)}
+\end{aligned}
+$$
+
+So we have 
+
+$$
+\begin{aligned}
+Q(\boldsymbol{\Psi\mid \Psi^{(k)}})
+& = \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} \lbrace \log  {\pi_{j} + \log \phi(y_{i}-\boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}};0,\sigma^2)} \rbrace \\
+& = \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} \log \pi_j + 
+\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} {1 \over \sqrt{2\pi \sigma^2}}
+\exp \lbrace {-(y_i - \boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}})^2 \over 2\sigma^2} \rbrace \\
+& = \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} \log \pi_j - {1 \over 2}
+\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} \log 2\pi \sigma^2 - {1 \over 2}\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)}
+{(y_i - \boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}})^2 \over \sigma^2} \\
+& = I_1 - {1 \over 2}I_2 - {1 \over 2}I_3 \\
+\end{aligned}
+$$
+
+The M-Step maximizes $Q(\boldsymbol{\Psi\mid \Psi^{(k)}})$ , for $I_1$, we have
+
+$$
+\begin{cases}
+\pi_1 + \pi_2 + \dots + \pi_m = 1 \\
+L(\pi_1 \ldots, \pi_m) = \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} \log \pi_j
+- \lambda \lbrace \sum_{j = 1}^m \pi_j - 1 \rbrace
+\end{cases}
+$$
+with $\lambda$ a Lagrange multiplier. Then
+
+$$
+\pi_j =  {\sum_{i = 1}^n p_{ij}^{(k + 1)} \over 
+\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} } = {1 \over n} \sum_{i = 1}^n p_{ij}^{(k + 1)}
+$$
+
+Only $I_3$ contains $\beta_j$, to minimize it, each $I_{3j}$ must be minimized. For each $\beta_j$, take derivitive of $I_{3j}$ and let it equal to 0. We have 
+$$
+\sum_{i = 1}^n p_{ij}^{(k + 1)}(-2 \mathbf{x}_i y_i + 2\mathbf{x}_i \mathbf{x}_i^\top \beta_j) = -2\sum_{i = 1}^n p_{ij}^{(k + 1)}\mathbf{x}_i y_i + 2\sum_{i = 1}^n p_{ij}^{(k + 1)}\mathbf{x}_i \mathbf{x}_i^\top \beta_j = 0
+$$
+Solve this equation, we have
+
+$$
+\beta_j = {\sum_{i = 1}^n \mathbf{x}_i p_{ij}^{(k + 1)} y_i \over \sum_{i = 1}^n \mathbf{x}_i \mathbf{x}_i^\top p_{ij}^{(k + 1)}}
+$$
+
+$I_2$ and $I_3$ contain $\sigma^2$, take the derivative of $I_2 + I_3$ with respect to $\sigma^2$ and let it equals 0, we have
+$$
+{1 \over \sigma^2} \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)} - {1 \over \sigma^4} \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)}
+(y_i - \boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}})^2 = 0
+$$
+Then we have
+
+$$
+\sigma^2 = {\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)}
+(y_i - \boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}})^2 \over \sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)}} = {\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)}
+(y_i - \boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}})^2 \over n}
+$$
+
+To sum up, at the $k$th iteration, the updating rules are as follows (notice that we need to update $\beta_j^{(k + 1)}$ before we use it to update $\sigma^{2^{(k + 1)}}$)
+$$
+\begin{cases}
+\pi_j^{(k + 1)} = {1 \over n} \sum_{i = 1}^n p_{ij}^{(k + 1)} \\
+\beta_j^{(k + 1)} = {\sum_{i = 1}^n \mathbf{x}_i p_{ij}^{(k + 1)} y_i \over \sum_{i = 1}^n \mathbf{x}_i \mathbf{x}_i^\top p_{ij}^{(k + 1)}} \\
+\sigma^{2^{(k + 1)}} = {\sum_{i = 1}^n \sum_{j = 1}^m p_{ij}^{(k + 1)}
+(y_i - \boldsymbol{\mathbf{x}_{i}^{\top}\beta_{j}^{(k + 1)}})^2 \over n}
+\end{cases}
+$$
+
+
+
+
+
+
+
+
+
+
+
