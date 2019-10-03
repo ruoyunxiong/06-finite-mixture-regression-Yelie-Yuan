@@ -202,7 +202,7 @@ set.seed(1205)
 dat <- regmix_sim(n, pi, bet, sig)
 ## regmix_em(y = dat[,1], xmat = dat[,-1], 
 ##           pi.init = pi / pi / length(pi),
-##           beta.init = bet * 0,
+##           beta.init = matrix(rnorm(6), 2, 3),
 ##           sigma.init = sig / sig, 
 ##           control = list(maxit = 500, tol = 1e-5))
 ```
@@ -210,10 +210,10 @@ dat <- regmix_sim(n, pi, bet, sig)
 
 Use the following code and initial values to estimate the parameters. 
 ```{r}
-regmix_em(y = dat[,1], xmat = dat[,-1], 
+regmix_em(y = dat[,1], xmat = dat[,-1],
           pi.init = pi / pi / length(pi),
           beta.init = matrix(rnorm(6), 2, 3),
-          sigma.init = sig / sig, 
+          sigma.init = sig / sig,
           control = list(maxit = 500, tol = 1e-5))
 ```
 
