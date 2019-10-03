@@ -212,7 +212,7 @@ Use the following code and initial values to estimate the parameters.
 ```{r}
 regmix_em(y = dat[,1], xmat = dat[,-1], 
           pi.init = pi / pi / length(pi),
-          beta.init = matrix(c(1, 2, 3, -2, -1, -4), 2, 3),
+          beta.init = matrix(rnorm(6), 2, 3),
           sigma.init = sig / sig, 
           control = list(maxit = 500, tol = 1e-5))
 ```
